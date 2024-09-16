@@ -83,7 +83,7 @@ new_md_voters_monthly_2024 |>
 
 **Q4** Maryland has, officially, five regions: https://www.visitmaryland.org/article/maryland-regions. Modify the original dataframe again to add a `region` column based on the `COUNTY` value using case_when. Are you going to have to do this for every Maryland county plus Baltimore City? Yes, you are. Which regions and parties account for the most new voters?
 
-**A4** 
+**A4** The Capital region and Central region account for the most new voters, although admittedly I could not get this function to work for R
 
 ```{r}
 new_md_voters_2024 <- new_md_voters_2024 |>

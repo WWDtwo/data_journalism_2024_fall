@@ -1,0 +1,106 @@
+---
+title: "lab_03"
+author: "Derek Willis"
+date: "2024-08-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and establish settings
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load the tidyverse
+library(tidyverse)
+
+# Load janitor
+library(janitor)
+```
+
+## Load data
+
+```{r}
+# Load MD slice of FEC House candidate contribution data
+md_contribs <- read_rds("data/lab_03.rds")
+```
+
+## Fix header issues
+
+You'll need to fix one issue with the column names using janitor. Write a code block to do that, making sure that you save the results to the same dataframe.
+
+```{r}
+md_contribs <- md_contribs |>
+  clean_names()
+```
+
+
+## Answer questions
+
+Q1: Which seven cities in Maryland had the largest *number* of contributions from donors? How many did each have? To answer this question, you'll have to clean the messy "contributor_city" field.
+
+Note: To answer this question, you'll need to see every variation of the "contributor_city" for the top seven cities, which you should identify through some initial analysis. Then find variations of them and change those variations into the most common version.
+
+A1: The seven cities are Bethesda (1177), Chevy Chase (705), Baltimore (692), Annapolis (493), Potomac (490), Silver Spring (408) and Rockville (358)
+
+```{r}
+cleaned_md_contribs <- md_contribs |>
+  mutate(contributor_city = str_to_title(contributor_city)) |>
+  mutate(contributor_city = case_when(
+    contributor_city == "Balrimore" | contributor_city == "Blatimore" ~ "Baltimore",
+    contributor_city == "Anapolis" | contributor_city == "Andrews Air Force Base" ~ "Annapolis",
+    contributor_city == "4615 North Park Ave Apt. 1410" ~ "Chevy Chase",
+    contributor_city == "Belair" ~ "Bel Air",
+    contributor_city == "Davidsdonville" ~ "Davidsonville",
+    contributor_city == "Ellicott" ~ "Ellicott City",
+    contributor_city == "Gaitherburg" ~ "Gaithersburg",
+    contributor_city == "Lutherville Timo" | contributor_city == "Lutherville Timoni" | contributor_city == "Lutherville Timonium" | contributor_city == "Luthvle Timon" ~ "Lutherville-Timonium",
+    contributor_city == "Marriotsville" ~ "Marriottsville",
+    contributor_city == "Mount Airy" | contributor_city == "Mt.airy" ~ "Mt. Airy",
+    contributor_city == "N Bethesda" ~ "North Bethesda",
+    contributor_city == "New Marked" ~ "New Market",
+    contributor_city == "Owins Mills" ~ "Owings Mills",
+    contributor_city == "Silver Springs" ~ "Silver Spring",
+    contributor_city == "Aaaaaa Oxon" ~ "Oxon",
+    TRUE ~ contributor_city
+  ))
+
+cleaned_md_contribs |>
+    group_by(contributor_city) |>
+  summarize(total_contribs = n()) |>
+  arrange(desc(total_contribs))
+```
+
+Q2: Find the 5-digit ZIP code in Maryland that had the highest total amount of contributions (by dollar value). You will need to use mutate to ensure that you have a zip code column with the first five characters from the existing zip code column.
+
+Where is that zip code and what kind of area is it, demographically? Which committee is the largest recipient of money from that zip code? How many of the top five recipients are Maryland candidates?
+
+A2:The top donor zip code was 20815, an affluent part of Chevy Chase. Just two Maryland candidate shows up in the top five recipients
+
+```{r}
+cleaned_md_contribs <- cleaned_md_contribs |>
+  mutate(contributor_zip = str_sub(contributor_zip, start=1L, end=5L))
+
+#Note to self: its 20815
+
+cleaned_md_contribs |>
+  filter(contributor_zip == "20815") |>
+  group_by(committee_name) |>
+  summarize(total_contribs = n()) |>
+  arrange(desc(total_contribs))
+```
+
+Q3: Let's look at top individual donors. Write code to generate a list of top donors using name and city, adding up the total amount of contributions. What does the original data say about the top two donors - who are they and what do they do? Do you see anything in the list of top 10 donors that would make you uncertain about the accuracy of these results?
+
+A3: The top two donors are a farmer and an attorney, respectively. The top donor, the farmer, beats out the attorneys and bankers and financiers for total donations. That does seem strange to me, but I will not be questioning the wealth of Ms. Melanie Jacobsen.
+
+```{r}
+cleaned_md_contribs |>
+  group_by(contributor_name) |>
+  summarize(total_amount = contribution_receipt_amount*n(), contributor_city, contributor_occupation) |>
+  arrange(desc(total_amount))
+```

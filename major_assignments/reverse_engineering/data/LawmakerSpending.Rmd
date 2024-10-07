@@ -1,0 +1,45 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+```
+
+```{r}
+sod_detail <- read.csv("downloads/sod_detail_grid/APRIL-JUNE-2024-SOD-DETAIL-GRID-FINAL.csv")
+```
+
+```{r}
+#Looking for general totals for Jack Bergman to see if they match the content of the article. They do not. We are about two grand short of the article's claims, and I suspect it is because they are counting something else as lodging too.
+sod_detail |>
+  filter(
+      ORGANIZATION == "2024 HON. JACK BERGMAN"
+  ) |>
+group_by(DESCRIPTION) |>
+  summarize(TOTAL_AMOUNT = sum(AMOUNT)) |>
+  arrange(desc(TOTAL_AMOUNT))
+```
+```{r}
+sod_detail |>
+  filter(
+      ORGANIZATION == "2024 HON. MATT GAETZ"
+  ) |>
+group_by(DESCRIPTION) |>
+  summarize(TOTAL_AMOUNT = sum(AMOUNT)) |>
+  arrange(desc(TOTAL_AMOUNT))
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

@@ -28,6 +28,7 @@ group_by(DESCRIPTION) |>
   arrange(desc(TOTAL_AMOUNT))
 ```
 ```{r}
+#Similar to the Jack Bergman situation, our spending numbers for Gaetz came up short of the article's claims. The lodging was a bit off and the food/beverage was WAY off.  
 sod_detail |>
   filter(
       ORGANIZATION == "2024 HON. MATT GAETZ"
@@ -36,6 +37,7 @@ group_by(DESCRIPTION) |>
   summarize(TOTAL_AMOUNT = sum(AMOUNT)) |>
   arrange(desc(TOTAL_AMOUNT))
 ```
+We seem to be no closer to finding a way to filter out all of the non-congressmember expenses in the .csv file. Doing so in the way we know how would take days on end. 
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 

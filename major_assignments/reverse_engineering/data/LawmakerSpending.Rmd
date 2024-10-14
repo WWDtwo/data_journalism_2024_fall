@@ -11,6 +11,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 library(tidyverse)
 library(janitor)
 library(lubridate)
+options(scipen = 999)
 ```
 
 ```{r}
@@ -21,24 +22,37 @@ sod_detail <- read.csv("downloads/sod_detail_grid/APRIL-JUNE-2024-SOD-DETAIL-GRI
 #Looking for general totals for Jack Bergman to see if they match the content of the article. They do not. We are about two grand short of the article's claims, and I suspect it is because they are counting something else as lodging too.
 sod_detail |>
   filter(
-      ORGANIZATION == "2024 HON. JACK BERGMAN"
+      ORGANIZATION == "2023 HON. JACK BERGMAN" | ORGANIZATION == "2024 HON. JACK BERGMAN" | ORGANIZATION == "2022 HON. JACK BERGMAN"
   ) |>
 group_by(DESCRIPTION) |>
   summarize(TOTAL_AMOUNT = sum(AMOUNT)) |>
   arrange(desc(TOTAL_AMOUNT))
 ```
 ```{r}
-#Similar to the Jack Bergman situation, our spending numbers for Gaetz came up short of the article's claims. The lodging was a bit off and the food/beverage was WAY off.  
-sod_detail |>
+sod_detail <- sod_detail |>
+  mutate(
+    `PERFORM.START.DT` = as.Date(`PERFORM.START.DT`, format = "%d-%b-%y"),
+    `PERFORM.END.DT` = as.Date(`PERFORM.END.DT`, format = "%d-%b-%y"),
+    `TRANSACTION.DATE` = as.Date(`TRANSACTION.DATE`, format = "%d-%b-%y")
+  )
+```
+
+```{r}
+GAETZ <- sod_detail |>
   filter(
-      ORGANIZATION == "2024 HON. MATT GAETZ"
-  ) |>
-group_by(DESCRIPTION) |>
+    ORGANIZATION == "2024 HON. MATT GAETZ",
+    year(as.Date(`TRANSACTION.DATE`, format = "%d-%b-%y")) == 2024 |
+       year(as.Date(`TRANSACTION.DATE`, format = "%d-%b-%y")) == 2023,
+    !str_detect(`SORT.SUBTOTAL.DESCRIPTION`, "PERSONELL COMPENSATION|FRANKED MAIL")
+  )
+```
+
+```{r}
+GAETZ |>
+  group_by(DESCRIPTION) |>
   summarize(TOTAL_AMOUNT = sum(AMOUNT)) |>
   arrange(desc(TOTAL_AMOUNT))
 ```
-We seem to be no closer to finding a way to filter out all of the non-congressmember expenses in the .csv file. Doing so in the way we know how would take days on end. 
-
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 

@@ -1,0 +1,51 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+options(scipen=999)
+library(tidyverse)
+library(lubridate)
+library(janitor)
+```
+
+```{r}
+jan_mar <- read.csv("Downloads/data_analysis/JAN-MAR-2024-SOD-DETAIL-GRID-FINAL.csv")
+apr_jun <- read.csv("Downloads/data_analysis/APRIL-JUNE-2024-SOD-DETAIL-GRID-FINAL (2).csv")
+
+jan_jun <- bind_rows(jan_mar, apr_jun)
+```
+
+Our combined dataset is 18 columns with 283,590 rows. The limits on timeframe
+is that there's an inconsistency in the start date and performance date of the
+expenditure. This means that we don't have a specific hold on the exact date
+that the congressmen incurred that expense. Furthermore, the dataset column of
+transaction date has a lot of NAs, which can cause us to not know the specifics
+of these expenses to know whether or not congressmen used it during their primary
+runs. 
+
+One: There may be issues answering this question with our dataset since not all transactions have dates attached to them. This might make estimating the amount of spending each program is making inaccurate.
+
+Two: For our question about top spenders on travel we will have to focus on either ground transportation or land transportation due to the fact that there are various descriptions of travel. For example, “TRANSPORTATION OF THINGS TOTALS” could be anything, so we need to be specific on one type of transportation
+
+Three: For our question on who spent the most on advertising the data is clean and specific that we can get a calculation on it. 
+
+Four: For question four, the data is clean enough to see who had the most expenditures within the dataframe. Because we joined the two dataframes together, we can easily keep a running tally of who has spent what money thus far. The way we can express it in this data is with the sum of “AMOUNT” grouped by office.
+
+Five: There wouldn’t be any issues for this question with the dataset. All of the descriptions are listed and they are well documented.
+
+
+```{r}
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

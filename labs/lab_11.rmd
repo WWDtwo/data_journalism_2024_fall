@@ -54,7 +54,7 @@ You should have 10 releases when finished, not 20.
 
 Then, write code that finds the most recent release with the word "Campaign" in the title. What election does it refer to?
 
-**A2**
+**A2** The press release refers to John King's gubernatorial campaign.
 
 ```{r}
 press_url <- "https://osp.maryland.gov/category/press-releases/"
@@ -70,6 +70,10 @@ press_release_table <- tibble(
     url = press_releases %>% html_node("a") %>% html_attr("href"),
     date = press_releases %>% html_node("time") %>% html_text(trim = TRUE)
   )
+
+press_release_table |>
+  filter(str_detect(name, "Campaign")) |>
+  group_by(name)
 ```
 
 **Q3** Sen. Ben Cardin, D-Maryland, has posted hundreds of press releases at <https://www.cardin.senate.gov/?post_type=press-releases>. It would be great to have all of them in a dataframe that has the following columns: date, title and url.
@@ -82,8 +86,34 @@ When you're done, rename the columns so they make sense, then make sure the date
 
 Finally, tell me what questions you could ask of this data, and what other information about it would be useful to have. Be creative.
 
-**A3**
+**A3** The beauty of press releases is that they give a full look at a politician's platform. Similarly to what we did above, we can look for the term "abortion" in press releases to see what Cardin thinks on that issue.
 
 ```{r}
+cardin_press <- "https://www.cardin.senate.gov/?post_type=press-releases"
 
+cardin_press_releases <- read_html("https://www.cardin.senate.gov/?post_type=press-releases")
+
+date <- cardin_press_releases |>
+  html_elements("h5") |>
+  html_text() |>
+  as_tibble()
+
+title <- cardin_press_releases |>
+  html_elements("h3") |>
+  html_text(trim = TRUE) |>
+  as_tibble()
+
+url <- cardin_press_releases |>
+  html_elements("h3 a") |>
+  html_attr("href") |>
+  as_tibble()
+
+title |>
+  bind_cols(date, url) |>
+  clean_names() |>
+  rename(
+    title = value_1,
+    date = value_2,
+    url = value_3
+  )
 ```
